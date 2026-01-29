@@ -89,6 +89,7 @@ extern "C"
         GPIO_STM32L496VGT6P_Status_Timeout,         ///< Timeout
     } GPIO_STM32L496VGT6P_Status_t;
 
+    // TODO Make use of `GPIO_STM32L496VGT6P_t` instead of `GPIO_STM32L496VGT6P_Instance_t`
     /**
      *  @brief GPIO STM32L496VGT6P
      *
