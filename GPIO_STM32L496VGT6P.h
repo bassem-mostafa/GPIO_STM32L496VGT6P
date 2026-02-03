@@ -289,7 +289,7 @@ extern "C"
     /**
      *  @brief GPIO STM32L496VGT6P Callback On Interrupt
      */
-    typedef GPIO_STM32L496VGT6P_Status_t ( *GPIO_STM32L496VGT6P_CallbackOnInterrupt_t )( GPIO_STM32L496VGT6P_Instance_t * Instance );
+    typedef GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_CallbackOnInterrupt_t( GPIO_STM32L496VGT6P_Instance_t * Instance );
 
     /**
      *  @brief GPIO STM32L496VGT6P Instance Context
@@ -307,7 +307,7 @@ extern "C"
     {
         GPIO_STM32L496VGT6P_t GPIOx;
 
-        GPIO_STM32L496VGT6P_CallbackOnInterrupt_t OnInterrupt;
+        GPIO_STM32L496VGT6P_CallbackOnInterrupt_t * OnInterrupt;
 
         // Managed Internally
         GPIO_STM32L496VGT6P_Instance_Context_t * Context;
@@ -412,8 +412,6 @@ extern "C"
      *  @return GPIO_STM32L496VGT6P_Status_t
      */
     GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Read( GPIO_STM32L496VGT6P_Instance_t * Instance, GPIO_STM32L496VGT6P_Value_t * Value );
-
-    // TODO Add More APIs
 
     // #############################################################################
     // #### Public Variable(s) #####################################################
