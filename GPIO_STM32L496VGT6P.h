@@ -294,9 +294,9 @@ extern "C"
     /**
      *  @brief GPIO STM32L496VGT6P Instance Context
      *
-     *  @struct GPIO_STM32L496VGT6P_Instance_Context_t
+     *  @struct GPIO_STM32L496VGT6P_InstanceContext_t
      */
-    typedef struct GPIO_STM32L496VGT6P_Instance_Context GPIO_STM32L496VGT6P_Instance_Context_t;
+    typedef struct GPIO_STM32L496VGT6P_InstanceContext GPIO_STM32L496VGT6P_InstanceContext_t;
 
     /**
      *  @brief GPIO STM32L496VGT6P Instance
@@ -310,7 +310,7 @@ extern "C"
         GPIO_STM32L496VGT6P_CallbackOnInterrupt_t * OnInterrupt;
 
         // Managed Internally
-        GPIO_STM32L496VGT6P_Instance_Context_t * Context;
+        GPIO_STM32L496VGT6P_InstanceContext_t * Context;
     } GPIO_STM32L496VGT6P_Instance_t;
 
     // #############################################################################

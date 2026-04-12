@@ -69,17 +69,17 @@ typedef enum GPIO_STM32L496VGT6P_Event
     GPIO_STM32L496VGT6P_Event_ExternalInterrupt = UTIL_BIT( 0 ),
 } GPIO_STM32L496VGT6P_Event_t;
 
-typedef struct GPIO_STM32L496VGT6P_Instance_Context
+typedef struct GPIO_STM32L496VGT6P_InstanceContext
 {
     GPIO_TypeDef * GPIOx;
     GPIO_InitTypeDef InitType;
     GPIO_STM32L496VGT6P_Event_t Event;
-} GPIO_STM32L496VGT6P_Instance_Context_t;
+} GPIO_STM32L496VGT6P_InstanceContext_t;
 
 typedef struct GPIO_STM32L496VGT6P_Context
 {
     TIM_Timestamp_t Timestamp;
-    GPIO_STM32L496VGT6P_Instance_Context_t Context[ GPIO_STM32L496VGT6P_Count ];
+    GPIO_STM32L496VGT6P_InstanceContext_t Context[ GPIO_STM32L496VGT6P_Count ];
 } GPIO_STM32L496VGT6P_Context_t;
 
 // #############################################################################
@@ -127,7 +127,7 @@ void HAL_GPIO_EXTI_Callback( uint16_t GPIO_Pin )
 {
     for ( GPIO_STM32L496VGT6P_t GPIO_x = GPIO_STM32L496VGT6P_1; GPIO_x < GPIO_STM32L496VGT6P_Count; ++GPIO_x )
     {
-        GPIO_STM32L496VGT6P_Instance_Context_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ GPIO_x ];
+        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ GPIO_x ];
         GPIO_InitTypeDef * InitType = &Context->InitType;
 
         if ( InitType->Pin == GPIO_Pin
@@ -247,7 +247,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Initialize( GPI
             break;
         }
 
-        GPIO_STM32L496VGT6P_Instance_Context_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ Instance->GPIOx ];
+        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ Instance->GPIOx ];
         GPIO_InitTypeDef * InitType = &Context->InitType;
 
         switch ( Instance->GPIOx )
@@ -494,7 +494,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Cycle( GPIO_STM
     {
         GPIO_Trace( "%s( Instance=%p )", __FUNCTION__, Instance );
 
-        GPIO_STM32L496VGT6P_Instance_Context_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ Instance->GPIOx ];
+        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ Instance->GPIOx ];
         GPIO_STM32L496VGT6P_Event_t Event = Context->Event; // CAUTION: Has to copy events occurred at the early start of the cycle, so as to be cleared at the end of the cycle,
                                                             //          which let events occurs after that for the next cycle call
 
@@ -544,7 +544,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Write( GPIO_STM
             break;
         }
 
-        GPIO_STM32L496VGT6P_Instance_Context_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ Instance->GPIOx ];
+        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ Instance->GPIOx ];
 
         if ( Context->GPIOx != NULL )
         {
@@ -570,7 +570,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Read( GPIO_STM3
             break;
         }
 
-        GPIO_STM32L496VGT6P_Instance_Context_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ Instance->GPIOx ];
+        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ Instance->GPIOx ];
 
         if ( Context->GPIOx != NULL )
         {
@@ -596,7 +596,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_SetMode( GPIO_S
             break;
         }
 
-        GPIO_STM32L496VGT6P_Instance_Context_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ Instance->GPIOx ];
+        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ Instance->GPIOx ];
 
         switch ( Mode )
         {
@@ -676,7 +676,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_SetPull( GPIO_S
             break;
         }
 
-        GPIO_STM32L496VGT6P_Instance_Context_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ Instance->GPIOx ];
+        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ Instance->GPIOx ];
 
         switch ( Pull )
         {
@@ -716,7 +716,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_SetSpeed( GPIO_
             break;
         }
 
-        GPIO_STM32L496VGT6P_Instance_Context_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ Instance->GPIOx ];
+        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ Instance->GPIOx ];
 
         switch ( Speed )
         {
@@ -760,7 +760,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_SetFunction( GP
             break;
         }
 
-        GPIO_STM32L496VGT6P_Instance_Context_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ Instance->GPIOx ];
+        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ Instance->GPIOx ];
 
         switch ( Function )
         {
@@ -807,7 +807,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Commit( GPIO_ST
     {
         GPIO_Trace( "%s( Instance=%p )", __FUNCTION__, Instance );
 
-        GPIO_STM32L496VGT6P_Instance_Context_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ Instance->GPIOx ];
+        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ Instance->GPIOx ];
 
         if ( Context->GPIOx != NULL )
         {
@@ -992,7 +992,7 @@ GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Read( GPIO_STM32L496VGT6P_Insta
 // #### Public Variable(s) #####################################################
 // #############################################################################
 
-const char GPIO_STM32L496VGT6P_VERSION[] = "0.0.0.v20260203-0213";
+const char GPIO_STM32L496VGT6P_VERSION[] = "0.0.0.v20260412-1852";
 
 // #############################################################################
 // #### File Guard #############################################################
