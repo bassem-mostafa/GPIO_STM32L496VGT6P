@@ -280,38 +280,10 @@ extern "C"
         GPIO_STM32L496VGT6P_Value_High,
     } GPIO_STM32L496VGT6P_Value_t;
 
-    // TODO Make use of `GPIO_STM32L496VGT6P_t` instead of `GPIO_STM32L496VGT6P_Instance_t`
-    /**
-     *  @brief GPIO STM32L496VGT6P Instance (Forward Declaration)
-     */
-    typedef struct GPIO_STM32L496VGT6P_Instance GPIO_STM32L496VGT6P_Instance_t;
-
     /**
      *  @brief GPIO STM32L496VGT6P Callback On Interrupt
      */
-    typedef GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_CallbackOnInterrupt_t( GPIO_STM32L496VGT6P_Instance_t * Instance );
-
-    /**
-     *  @brief GPIO STM32L496VGT6P Instance Context
-     *
-     *  @struct GPIO_STM32L496VGT6P_InstanceContext_t
-     */
-    typedef struct GPIO_STM32L496VGT6P_InstanceContext GPIO_STM32L496VGT6P_InstanceContext_t;
-
-    /**
-     *  @brief GPIO STM32L496VGT6P Instance
-     *
-     *  @struct GPIO_STM32L496VGT6P_Instance_t
-     */
-    typedef struct GPIO_STM32L496VGT6P_Instance
-    {
-        GPIO_STM32L496VGT6P_t GPIOx;
-
-        GPIO_STM32L496VGT6P_CallbackOnInterrupt_t * OnInterrupt;
-
-        // Managed Internally
-        GPIO_STM32L496VGT6P_InstanceContext_t * Context;
-    } GPIO_STM32L496VGT6P_Instance_t;
+    typedef GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_CallbackOnInterrupt_t( GPIO_STM32L496VGT6P_t GPIOx );
 
     // #############################################################################
     // #### Public Method(s) #######################################################
@@ -320,98 +292,98 @@ extern "C"
     /**
      *  @brief Initializes specified GPIO STM32L496VGT6P Instance
      *
-     *  @param[in] Instance Instance
+     *  @param[in] GPIOx GPIO Instance
      *
      *  @return GPIO_STM32L496VGT6P_Status_t
      */
-    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Initialize( GPIO_STM32L496VGT6P_Instance_t * Instance );
+    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Initialize( GPIO_STM32L496VGT6P_t GPIOx );
 
     /**
      *  @brief Cycles specified GPIO STM32L496VGT6P Instance
      *
-     *  @param[in] Instance Instance
+     *  @param[in] GPIOx GPIO Instance
      *
      *  @return GPIO_STM32L496VGT6P_Status_t
      */
-    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Cycle( GPIO_STM32L496VGT6P_Instance_t * Instance );
+    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Cycle( GPIO_STM32L496VGT6P_t GPIOx );
 
     /**
      *  @brief De-initializes specified GPIO STM32L496VGT6P Instance
      *
-     *  @param[in] Instance Instance
+     *  @param[in] GPIOx GPIO Instance
      *
      *  @return GPIO_STM32L496VGT6P_Status_t
      */
-    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_DeInitialize( GPIO_STM32L496VGT6P_Instance_t * Instance );
+    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_DeInitialize( GPIO_STM32L496VGT6P_t GPIOx );
 
     /**
      *  @brief Sets mode of specified GPIO STM32L496VGT6P Instance
      *
-     *  @param[in] Instance Instance
-     *  @param[in] Mode     Mode
+     *  @param[in] GPIOx GPIO Instance
+     *  @param[in] Mode  Mode
      *
      *  @return GPIO_STM32L496VGT6P_Status_t
      */
-    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_SetMode( GPIO_STM32L496VGT6P_Instance_t * Instance, GPIO_STM32L496VGT6P_Mode_t Mode );
+    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_SetMode( GPIO_STM32L496VGT6P_t GPIOx, GPIO_STM32L496VGT6P_Mode_t Mode );
 
     /**
      *  @brief Sets pull of specified GPIO STM32L496VGT6P Instance
      *
-     *  @param[in] Instance Instance
-     *  @param[in] Pull     Pull
+     *  @param[in] GPIOx GPIO Instance
+     *  @param[in] Pull  Pull
      *
      *  @return GPIO_STM32L496VGT6P_Status_t
      */
-    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_SetPull( GPIO_STM32L496VGT6P_Instance_t * Instance, GPIO_STM32L496VGT6P_Pull_t Pull );
+    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_SetPull( GPIO_STM32L496VGT6P_t GPIOx, GPIO_STM32L496VGT6P_Pull_t Pull );
 
     /**
      *  @brief Sets speed of specified GPIO STM32L496VGT6P Instance
      *
-     *  @param[in] Instance Instance
-     *  @param[in] Speed    Speed
+     *  @param[in] GPIOx GPIO Instance
+     *  @param[in] Speed Speed
      *
      *  @return GPIO_STM32L496VGT6P_Status_t
      */
-    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_SetSpeed( GPIO_STM32L496VGT6P_Instance_t * Instance, GPIO_STM32L496VGT6P_Speed_t Speed );
+    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_SetSpeed( GPIO_STM32L496VGT6P_t GPIOx, GPIO_STM32L496VGT6P_Speed_t Speed );
 
     /**
      *  @brief Sets function of specified GPIO STM32L496VGT6P Instance
      *
-     *  @param[in] Instance Instance
+     *  @param[in] GPIOx GPIO Instance
      *  @param[in] Function Function
      *
      *  @return GPIO_STM32L496VGT6P_Status_t
      */
-    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_SetFunction( GPIO_STM32L496VGT6P_Instance_t * Instance, GPIO_STM32L496VGT6P_Function_t Function );
+    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_SetFunction( GPIO_STM32L496VGT6P_t GPIOx, GPIO_STM32L496VGT6P_Function_t Function );
 
     /**
      *  @brief Commit settings of specified GPIO STM32L496VGT6P Instance
      *
-     *  @param[in] Instance Instance
+     *  @param[in] GPIOx GPIO Instance
      *
      *  @return GPIO_STM32L496VGT6P_Status_t
      */
-    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Commit( GPIO_STM32L496VGT6P_Instance_t * Instance );
+    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Commit( GPIO_STM32L496VGT6P_t GPIOx );
 
     /**
      *  @brief Write value to specified GPIO STM32L496VGT6P Instance
      *
-     *  @param[in] Instance Instance
-     *  @param[in] Value    Value
+     *  @param[in] GPIOx GPIO Instance
+     *  @param[in] Value Value
      *
      *  @return GPIO_STM32L496VGT6P_Status_t
      */
-    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Write( GPIO_STM32L496VGT6P_Instance_t * Instance, GPIO_STM32L496VGT6P_Value_t Value );
+    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Write( GPIO_STM32L496VGT6P_t GPIOx, GPIO_STM32L496VGT6P_Value_t Value );
 
     /**
      *  @brief Read value of specified GPIO STM32L496VGT6P Instance
      *
-     *  @param[in]  Instance Instance
-     *  @param[out] Value    Value pointer
+     *  @param[in]  GPIOx GPIO Instance
+     *  @param[out] Value Value pointer
      *
      *  @return GPIO_STM32L496VGT6P_Status_t
      */
-    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Read( GPIO_STM32L496VGT6P_Instance_t * Instance, GPIO_STM32L496VGT6P_Value_t * Value );
+    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Read( GPIO_STM32L496VGT6P_t GPIOx, GPIO_STM32L496VGT6P_Value_t * Value );
 
     // #############################################################################
     // #### Public Variable(s) #####################################################
