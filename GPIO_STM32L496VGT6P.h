@@ -317,6 +317,16 @@ extern "C"
     GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_DeInitialize( GPIO_STM32L496VGT6P_t GPIOx );
 
     /**
+     *  @brief Sets on-interrupt callback of specified GPIO STM32L496VGT6P Instance
+     *
+     *  @param[in] GPIOx    GPIO Instance
+     *  @param[in] Callback Callback
+     *
+     *  @return GPIO_STM32L496VGT6P_Status_t
+     */
+    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_SetCallbackOnInterrupt( GPIO_STM32L496VGT6P_t GPIOx, GPIO_STM32L496VGT6P_CallbackOnInterrupt_t Callback );
+
+    /**
      *  @brief Sets mode of specified GPIO STM32L496VGT6P Instance
      *
      *  @param[in] GPIOx GPIO Instance

@@ -74,6 +74,7 @@ typedef struct GPIO_STM32L496VGT6P_InstanceContext
     GPIO_TypeDef * GPIOx;
     GPIO_InitTypeDef InitType;
     GPIO_STM32L496VGT6P_Event_t Event;
+    GPIO_STM32L496VGT6P_CallbackOnInterrupt_t * OnInterrupt;
 } GPIO_STM32L496VGT6P_InstanceContext_t;
 
 typedef struct GPIO_STM32L496VGT6P_Context
@@ -192,6 +193,8 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Context_Initialize( void
     {
         GPIO_Trace( "%s( void )", __FUNCTION__ );
 
+        UTIL_UNUSED( GPIO_STM32L496VGT6P_Context );
+
         // FIXME Remove the usage of `MX_GPIO_Init()`
     #if 1
         extern void MX_GPIO_Init( void );
@@ -212,6 +215,8 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Context_Cycle( void )
     do
     {
         GPIO_Trace( "%s( void )", __FUNCTION__ );
+
+        UTIL_UNUSED( GPIO_STM32L496VGT6P_Context );
     }
     while ( 0 );
 
@@ -225,6 +230,8 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Context_DeInitialize( vo
     do
     {
         GPIO_Trace( "%s( void )", __FUNCTION__ );
+
+        UTIL_UNUSED( GPIO_STM32L496VGT6P_Context );
 
         // TODO Disable All External Interrupts
     }
@@ -243,6 +250,10 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Initialize( GPI
 
         GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ GPIOx ];
         GPIO_InitTypeDef * InitType = &Context->InitType;
+
+        Context->GPIOx = NULL;
+        Context->Event = GPIO_STM32L496VGT6P_Event_None;
+        Context->OnInterrupt = NULL;
 
         switch ( GPIOx )
         {
@@ -495,11 +506,6 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Cycle( GPIO_STM
             Context->Event &= ~GPIO_STM32L496VGT6P_Event_ExternalInterrupt;
             GPIO_Debug( "External Interrupt: GPIO=%d", GPIOx );
 
-            // FIXME
-            // if ( Instance->OnInterrupt != NULL )
-            // {
-            //     Instance->OnInterrupt( GPIOx );
-            // }
             GPIO_Warning( "FIXME Implement on interrupt callback" );
         }
     }
@@ -847,6 +853,23 @@ GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_DeInitialize( GPIO_STM32L496VGT
     return Status;
 }
 
+GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_SetCallbackOnInterrupt( GPIO_STM32L496VGT6P_t GPIOx, GPIO_STM32L496VGT6P_CallbackOnInterrupt_t Callback )
+{
+    GPIO_STM32L496VGT6P_Status_t Status = GPIO_STM32L496VGT6P_Status_Success;
+
+    do
+    {
+        GPIO_Trace( "%s( GPIOx=%d, Callback=%p )", __FUNCTION__, GPIOx, Callback );
+
+        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ GPIOx ];
+
+        Context->OnInterrupt = Callback;
+    }
+    while ( 0 );
+
+    return Status;
+}
+
 GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_SetMode( GPIO_STM32L496VGT6P_t GPIOx, GPIO_STM32L496VGT6P_Mode_t Mode )
 {
     GPIO_STM32L496VGT6P_Status_t Status = GPIO_STM32L496VGT6P_Status_Success;
@@ -956,7 +979,7 @@ GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Read( GPIO_STM32L496VGT6P_t GPI
 // #### Public Variable(s) #####################################################
 // #############################################################################
 
-const char GPIO_STM32L496VGT6P_VERSION[] = "0.0.0.v20260518-0029";
+const char GPIO_STM32L496VGT6P_VERSION[] = "0.0.0.v20260523-1800";
 
 // #############################################################################
 // #### File Guard #############################################################
