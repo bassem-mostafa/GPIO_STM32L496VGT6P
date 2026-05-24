@@ -285,6 +285,11 @@ extern "C"
      */
     typedef GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_CallbackOnInterrupt_t( GPIO_STM32L496VGT6P_t GPIOx );
 
+    /**
+     *  @brief GPIO STM32L496VGT6P Callback On Event
+     */
+    typedef GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_CallbackOnEvent_t( GPIO_STM32L496VGT6P_t GPIOx );
+
     // #############################################################################
     // #### Public Method(s) #######################################################
     // #############################################################################
@@ -325,6 +330,16 @@ extern "C"
      *  @return GPIO_STM32L496VGT6P_Status_t
      */
     GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_SetCallbackOnInterrupt( GPIO_STM32L496VGT6P_t GPIOx, GPIO_STM32L496VGT6P_CallbackOnInterrupt_t Callback );
+
+    /**
+     *  @brief Sets on-event callback of specified GPIO STM32L496VGT6P Instance
+     *
+     *  @param[in] GPIOx    GPIO Instance
+     *  @param[in] Callback Callback
+     *
+     *  @return GPIO_STM32L496VGT6P_Status_t
+     */
+    GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_SetCallbackOnEvent( GPIO_STM32L496VGT6P_t GPIOx, GPIO_STM32L496VGT6P_CallbackOnEvent_t Callback );
 
     /**
      *  @brief Sets mode of specified GPIO STM32L496VGT6P Instance

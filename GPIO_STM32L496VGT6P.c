@@ -67,6 +67,7 @@ typedef enum GPIO_STM32L496VGT6P_Event
 {
     GPIO_STM32L496VGT6P_Event_None = 0,
     GPIO_STM32L496VGT6P_Event_ExternalInterrupt = UTIL_BIT( 0 ),
+    GPIO_STM32L496VGT6P_Event_ExternalEvent = UTIL_BIT( 1 ),
 } GPIO_STM32L496VGT6P_Event_t;
 
 typedef struct GPIO_STM32L496VGT6P_InstanceContext
@@ -75,6 +76,7 @@ typedef struct GPIO_STM32L496VGT6P_InstanceContext
     GPIO_InitTypeDef InitType;
     GPIO_STM32L496VGT6P_Event_t Event;
     GPIO_STM32L496VGT6P_CallbackOnInterrupt_t * OnInterrupt;
+    GPIO_STM32L496VGT6P_CallbackOnEvent_t * OnEvent;
 } GPIO_STM32L496VGT6P_InstanceContext_t;
 
 typedef struct GPIO_STM32L496VGT6P_Context
@@ -506,7 +508,21 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Cycle( GPIO_STM
             Context->Event &= ~GPIO_STM32L496VGT6P_Event_ExternalInterrupt;
             GPIO_Debug( "External Interrupt: GPIO=%d", GPIOx );
 
-            GPIO_Warning( "FIXME Implement on interrupt callback" );
+            if ( Context->OnInterrupt )
+            {
+                Context->OnInterrupt( GPIOx );
+            }
+        }
+
+        if ( ( Event & GPIO_STM32L496VGT6P_Event_ExternalEvent ) == GPIO_STM32L496VGT6P_Event_ExternalEvent )
+        {
+            Context->Event &= ~GPIO_STM32L496VGT6P_Event_ExternalEvent;
+            GPIO_Debug( "External Event: GPIO=%d", GPIOx );
+
+            if ( Context->OnEvent )
+            {
+                Context->OnEvent( GPIOx );
+            }
         }
     }
     while ( 0 );
@@ -870,6 +886,23 @@ GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_SetCallbackOnInterrupt( GPIO_ST
     return Status;
 }
 
+GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_SetCallbackOnEvent( GPIO_STM32L496VGT6P_t GPIOx, GPIO_STM32L496VGT6P_CallbackOnEvent_t Callback )
+{
+    GPIO_STM32L496VGT6P_Status_t Status = GPIO_STM32L496VGT6P_Status_Success;
+
+    do
+    {
+        GPIO_Trace( "%s( GPIOx=%d, Callback=%p )", __FUNCTION__, GPIOx, Callback );
+
+        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ GPIOx ];
+
+        Context->OnEvent = Callback;
+    }
+    while ( 0 );
+
+    return Status;
+}
+
 GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_SetMode( GPIO_STM32L496VGT6P_t GPIOx, GPIO_STM32L496VGT6P_Mode_t Mode )
 {
     GPIO_STM32L496VGT6P_Status_t Status = GPIO_STM32L496VGT6P_Status_Success;
@@ -979,7 +1012,7 @@ GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Read( GPIO_STM32L496VGT6P_t GPI
 // #### Public Variable(s) #####################################################
 // #############################################################################
 
-const char GPIO_STM32L496VGT6P_VERSION[] = "0.0.0.v20260523-1800";
+const char GPIO_STM32L496VGT6P_VERSION[] = "0.0.0.v20260524-1454";
 
 // #############################################################################
 // #### File Guard #############################################################
