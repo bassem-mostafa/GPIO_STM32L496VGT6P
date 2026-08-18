@@ -70,19 +70,18 @@ typedef enum GPIO_STM32L496VGT6P_Event
     GPIO_STM32L496VGT6P_Event_ExternalEvent = UTIL_BIT( 1 ),
 } GPIO_STM32L496VGT6P_Event_t;
 
-typedef struct GPIO_STM32L496VGT6P_InstanceContext
+typedef struct GPIO_STM32L496VGT6P_Instance
 {
     GPIO_TypeDef * GPIOx;
     GPIO_InitTypeDef InitType;
     GPIO_STM32L496VGT6P_Event_t Event;
     GPIO_STM32L496VGT6P_CallbackOnInterrupt_t * OnInterrupt;
     GPIO_STM32L496VGT6P_CallbackOnEvent_t * OnEvent;
-} GPIO_STM32L496VGT6P_InstanceContext_t;
+} GPIO_STM32L496VGT6P_Instance_t;
 
 typedef struct GPIO_STM32L496VGT6P_Context
 {
-    TIM_Timestamp_t Timestamp;
-    GPIO_STM32L496VGT6P_InstanceContext_t Context[ GPIO_STM32L496VGT6P_Count ];
+    GPIO_STM32L496VGT6P_Instance_t Instance[ GPIO_STM32L496VGT6P_Count ];
 } GPIO_STM32L496VGT6P_Context_t;
 
 // #############################################################################
@@ -128,17 +127,20 @@ static GPIO_STM32L496VGT6P_Context_t GPIO_STM32L496VGT6P_Context;
 
 void HAL_GPIO_EXTI_Callback( uint16_t GPIO_Pin )
 {
+    // TODO Improve getting the right instance of the provided pin number
+    //      Possible solutions:
+    //          - Loop over port pin numbers equal to `GPIO_Pin` ex: GPIO_Pin=0, should loop over PA0, PB0, PC0, PD0, PE0, ...etc
     for ( GPIO_STM32L496VGT6P_t GPIO_x = GPIO_STM32L496VGT6P_1; GPIO_x < GPIO_STM32L496VGT6P_Count; ++GPIO_x )
     {
-        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ GPIO_x ];
-        GPIO_InitTypeDef * InitType = &Context->InitType;
+        GPIO_STM32L496VGT6P_Instance_t * Instance = &GPIO_STM32L496VGT6P_Context.Instance[ GPIO_x ];
+        GPIO_InitTypeDef * InitType = &Instance->InitType;
 
         if ( InitType->Pin == GPIO_Pin
              && ( InitType->Mode == GPIO_MODE_IT_RISING
                   || InitType->Mode == GPIO_MODE_IT_FALLING
                   || InitType->Mode == GPIO_MODE_IT_RISING_FALLING ) )
         {
-            Context->Event |= GPIO_STM32L496VGT6P_Event_ExternalInterrupt;
+            Instance->Event |= GPIO_STM32L496VGT6P_Event_ExternalInterrupt;
         }
     }
 }
@@ -250,12 +252,12 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Initialize( GPI
     {
         GPIO_Trace( "%s( GPIOx=%d )", __FUNCTION__, GPIOx );
 
-        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ GPIOx ];
-        GPIO_InitTypeDef * InitType = &Context->InitType;
+        GPIO_STM32L496VGT6P_Instance_t * Instance = &GPIO_STM32L496VGT6P_Context.Instance[ GPIOx ];
+        GPIO_InitTypeDef * InitType = &Instance->InitType;
 
-        Context->GPIOx = NULL;
-        Context->Event = GPIO_STM32L496VGT6P_Event_None;
-        Context->OnInterrupt = NULL;
+        Instance->GPIOx = NULL;
+        Instance->Event = GPIO_STM32L496VGT6P_Event_None;
+        Instance->OnInterrupt = NULL;
 
         switch ( GPIOx )
         {
@@ -265,7 +267,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Initialize( GPI
             case GPIO_STM32L496VGT6P_4:
             case GPIO_STM32L496VGT6P_5:
                 __HAL_RCC_GPIOE_CLK_ENABLE( );
-                Context->GPIOx = GPIOE;
+                Instance->GPIOx = GPIOE;
                 InitType->Pin = GPIO_PIN_2 << ( GPIOx - GPIO_STM32L496VGT6P_1 );
                 break;
 
@@ -274,7 +276,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Initialize( GPI
 
             case GPIO_STM32L496VGT6P_7:
                 __HAL_RCC_GPIOC_CLK_ENABLE( );
-                Context->GPIOx = GPIOC;
+                Instance->GPIOx = GPIOC;
                 InitType->Pin = GPIO_PIN_13 << ( GPIOx - GPIO_STM32L496VGT6P_7 );
                 break;
 
@@ -292,7 +294,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Initialize( GPI
             case GPIO_STM32L496VGT6P_17:
             case GPIO_STM32L496VGT6P_18:
                 __HAL_RCC_GPIOC_CLK_ENABLE( );
-                Context->GPIOx = GPIOC;
+                Instance->GPIOx = GPIOC;
                 InitType->Pin = GPIO_PIN_0 << ( GPIOx - GPIO_STM32L496VGT6P_15 );
                 break;
 
@@ -307,7 +309,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Initialize( GPI
             case GPIO_STM32L496VGT6P_25:
             case GPIO_STM32L496VGT6P_26:
                 __HAL_RCC_GPIOA_CLK_ENABLE( );
-                Context->GPIOx = GPIOA;
+                Instance->GPIOx = GPIOA;
                 InitType->Pin = GPIO_PIN_0 << ( GPIOx - GPIO_STM32L496VGT6P_23 );
                 break;
 
@@ -320,14 +322,14 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Initialize( GPI
             case GPIO_STM32L496VGT6P_31:
             case GPIO_STM32L496VGT6P_32:
                 __HAL_RCC_GPIOA_CLK_ENABLE( );
-                Context->GPIOx = GPIOA;
+                Instance->GPIOx = GPIOA;
                 InitType->Pin = GPIO_PIN_4 << ( GPIOx - GPIO_STM32L496VGT6P_29 );
                 break;
 
             case GPIO_STM32L496VGT6P_33:
             case GPIO_STM32L496VGT6P_34:
                 __HAL_RCC_GPIOC_CLK_ENABLE( );
-                Context->GPIOx = GPIOC;
+                Instance->GPIOx = GPIOC;
                 InitType->Pin = GPIO_PIN_4 << ( GPIOx - GPIO_STM32L496VGT6P_33 );
                 break;
 
@@ -335,7 +337,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Initialize( GPI
             case GPIO_STM32L496VGT6P_36:
             case GPIO_STM32L496VGT6P_37:
                 __HAL_RCC_GPIOB_CLK_ENABLE( );
-                Context->GPIOx = GPIOB;
+                Instance->GPIOx = GPIOB;
                 InitType->Pin = GPIO_PIN_0 << ( GPIOx - GPIO_STM32L496VGT6P_35 );
                 break;
 
@@ -349,13 +351,13 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Initialize( GPI
             case GPIO_STM32L496VGT6P_45:
             case GPIO_STM32L496VGT6P_46:
                 __HAL_RCC_GPIOE_CLK_ENABLE( );
-                Context->GPIOx = GPIOE;
+                Instance->GPIOx = GPIOE;
                 InitType->Pin = GPIO_PIN_7 << ( GPIOx - GPIO_STM32L496VGT6P_38 );
                 break;
 
             case GPIO_STM32L496VGT6P_47:
                 __HAL_RCC_GPIOB_CLK_ENABLE( );
-                Context->GPIOx = GPIOB;
+                Instance->GPIOx = GPIOB;
                 InitType->Pin = GPIO_PIN_10 << ( GPIOx - GPIO_STM32L496VGT6P_47 );
                 break;
 
@@ -369,7 +371,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Initialize( GPI
             case GPIO_STM32L496VGT6P_53:
             case GPIO_STM32L496VGT6P_54:
                 __HAL_RCC_GPIOB_CLK_ENABLE( );
-                Context->GPIOx = GPIOB;
+                Instance->GPIOx = GPIOB;
                 InitType->Pin = GPIO_PIN_12 << ( GPIOx - GPIO_STM32L496VGT6P_51 );
                 break;
 
@@ -382,7 +384,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Initialize( GPI
             case GPIO_STM32L496VGT6P_61:
             case GPIO_STM32L496VGT6P_62:
                 __HAL_RCC_GPIOD_CLK_ENABLE( );
-                Context->GPIOx = GPIOD;
+                Instance->GPIOx = GPIOD;
                 InitType->Pin = GPIO_PIN_8 << ( GPIOx - GPIO_STM32L496VGT6P_55 );
                 break;
 
@@ -391,7 +393,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Initialize( GPI
             case GPIO_STM32L496VGT6P_65:
             case GPIO_STM32L496VGT6P_66:
                 __HAL_RCC_GPIOC_CLK_ENABLE( );
-                Context->GPIOx = GPIOC;
+                Instance->GPIOx = GPIOC;
                 InitType->Pin = GPIO_PIN_6 << ( GPIOx - GPIO_STM32L496VGT6P_63 );
                 break;
 
@@ -399,7 +401,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Initialize( GPI
             case GPIO_STM32L496VGT6P_68:
             case GPIO_STM32L496VGT6P_69:
                 __HAL_RCC_GPIOA_CLK_ENABLE( );
-                Context->GPIOx = GPIOA;
+                Instance->GPIOx = GPIOA;
                 InitType->Pin = GPIO_PIN_8 << ( GPIOx - GPIO_STM32L496VGT6P_67 );
                 break;
 
@@ -414,7 +416,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Initialize( GPI
 
             case GPIO_STM32L496VGT6P_77:
                 __HAL_RCC_GPIOA_CLK_ENABLE( );
-                Context->GPIOx = GPIOA;
+                Instance->GPIOx = GPIOA;
                 InitType->Pin = GPIO_PIN_15 << ( GPIOx - GPIO_STM32L496VGT6P_77 );
                 break;
 
@@ -422,7 +424,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Initialize( GPI
             case GPIO_STM32L496VGT6P_79:
             case GPIO_STM32L496VGT6P_80:
                 __HAL_RCC_GPIOC_CLK_ENABLE( );
-                Context->GPIOx = GPIOC;
+                Instance->GPIOx = GPIOC;
                 InitType->Pin = GPIO_PIN_10 << ( GPIOx - GPIO_STM32L496VGT6P_78 );
                 break;
 
@@ -435,7 +437,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Initialize( GPI
             case GPIO_STM32L496VGT6P_87:
             case GPIO_STM32L496VGT6P_88:
                 __HAL_RCC_GPIOD_CLK_ENABLE( );
-                Context->GPIOx = GPIOD;
+                Instance->GPIOx = GPIOD;
                 InitType->Pin = GPIO_PIN_0 << ( GPIOx - GPIO_STM32L496VGT6P_81 );
                 break;
 
@@ -445,7 +447,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Initialize( GPI
             case GPIO_STM32L496VGT6P_92:
             case GPIO_STM32L496VGT6P_93:
                 __HAL_RCC_GPIOB_CLK_ENABLE( );
-                Context->GPIOx = GPIOB;
+                Instance->GPIOx = GPIOB;
                 InitType->Pin = GPIO_PIN_3 << ( GPIOx - GPIO_STM32L496VGT6P_89 );
                 break;
 
@@ -455,13 +457,13 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Initialize( GPI
             case GPIO_STM32L496VGT6P_95:
             case GPIO_STM32L496VGT6P_96:
                 __HAL_RCC_GPIOB_CLK_ENABLE( );
-                Context->GPIOx = GPIOB;
+                Instance->GPIOx = GPIOB;
                 InitType->Pin = GPIO_PIN_8 << ( GPIOx - GPIO_STM32L496VGT6P_95 );
                 break;
 
             case GPIO_STM32L496VGT6P_97:
                 __HAL_RCC_GPIOE_CLK_ENABLE( );
-                Context->GPIOx = GPIOE;
+                Instance->GPIOx = GPIOE;
                 InitType->Pin = GPIO_PIN_0 << ( GPIOx - GPIO_STM32L496VGT6P_97 );
                 break;
 
@@ -499,30 +501,36 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Cycle( GPIO_STM
     {
         GPIO_Trace( "%s( GPIOx=%d )", __FUNCTION__, GPIOx );
 
-        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ GPIOx ];
-        GPIO_STM32L496VGT6P_Event_t Event = Context->Event; // CAUTION: Has to copy events occurred at the early start of the cycle, so as to be cleared at the end of the cycle,
-                                                            //          which let events occurs after that for the next cycle call
+        GPIO_STM32L496VGT6P_Instance_t * Instance = &GPIO_STM32L496VGT6P_Context.Instance[ GPIOx ];
+        GPIO_STM32L496VGT6P_Event_t Event = Instance->Event; // CAUTION: Has to copy events occurred at the early start of the cycle, so as to be cleared at the end of the cycle,
+                                                             //          which let events occurs after that for the next cycle call
+        Instance->Event &= ~Event;                           //          Clear captured events
 
         if ( ( Event & GPIO_STM32L496VGT6P_Event_ExternalInterrupt ) == GPIO_STM32L496VGT6P_Event_ExternalInterrupt )
         {
-            Context->Event &= ~GPIO_STM32L496VGT6P_Event_ExternalInterrupt;
+            Event &= ~GPIO_STM32L496VGT6P_Event_ExternalInterrupt;
             GPIO_Debug( "External Interrupt: GPIO=%d", GPIOx );
 
-            if ( Context->OnInterrupt )
+            if ( Instance->OnInterrupt )
             {
-                Context->OnInterrupt( GPIOx );
+                Instance->OnInterrupt( GPIOx );
             }
         }
 
         if ( ( Event & GPIO_STM32L496VGT6P_Event_ExternalEvent ) == GPIO_STM32L496VGT6P_Event_ExternalEvent )
         {
-            Context->Event &= ~GPIO_STM32L496VGT6P_Event_ExternalEvent;
+            Event &= ~GPIO_STM32L496VGT6P_Event_ExternalEvent;
             GPIO_Debug( "External Event: GPIO=%d", GPIOx );
 
-            if ( Context->OnEvent )
+            if ( Instance->OnEvent )
             {
-                Context->OnEvent( GPIOx );
+                Instance->OnEvent( GPIOx );
             }
+        }
+
+        if ( Event )
+        {
+            GPIO_Warning( "Not handled events %X: GPIOx=%d", Event, GPIOx );
         }
     }
     while ( 0 );
@@ -554,11 +562,11 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Write( GPIO_STM
     {
         GPIO_Trace( "%s( GPIOx=%d, Value=%d )", __FUNCTION__, GPIOx, Value );
 
-        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ GPIOx ];
+        GPIO_STM32L496VGT6P_Instance_t * Instance = &GPIO_STM32L496VGT6P_Context.Instance[ GPIOx ];
 
-        if ( Context->GPIOx != NULL )
+        if ( Instance->GPIOx != NULL )
         {
-            HAL_GPIO_WritePin( Context->GPIOx, Context->InitType.Pin, Value );
+            HAL_GPIO_WritePin( Instance->GPIOx, Instance->InitType.Pin, Value );
         }
     }
     while ( 0 );
@@ -580,11 +588,11 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Read( GPIO_STM3
             break;
         }
 
-        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ GPIOx ];
+        GPIO_STM32L496VGT6P_Instance_t * Instance = &GPIO_STM32L496VGT6P_Context.Instance[ GPIOx ];
 
-        if ( Context->GPIOx != NULL )
+        if ( Instance->GPIOx != NULL )
         {
-            *Value = HAL_GPIO_ReadPin( Context->GPIOx, Context->InitType.Pin );
+            *Value = HAL_GPIO_ReadPin( Instance->GPIOx, Instance->InitType.Pin );
         }
     }
     while ( 0 );
@@ -600,60 +608,60 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_SetMode( GPIO_S
     {
         GPIO_Trace( "%s( GPIOx=%d, Mode=%d )", __FUNCTION__, GPIOx, Mode );
 
-        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ GPIOx ];
+        GPIO_STM32L496VGT6P_Instance_t * Instance = &GPIO_STM32L496VGT6P_Context.Instance[ GPIOx ];
 
         switch ( Mode )
         {
             case GPIO_STM32L496VGT6P_Mode_Input:
-                Context->InitType.Mode = GPIO_MODE_INPUT;
+                Instance->InitType.Mode = GPIO_MODE_INPUT;
                 break;
 
             case GPIO_STM32L496VGT6P_Mode_Output:
-                Context->InitType.Mode = GPIO_MODE_OUTPUT_PP;
+                Instance->InitType.Mode = GPIO_MODE_OUTPUT_PP;
                 break;
 
             case GPIO_STM32L496VGT6P_Mode_OutputOpenDrain:
-                Context->InitType.Mode = GPIO_MODE_OUTPUT_OD;
+                Instance->InitType.Mode = GPIO_MODE_OUTPUT_OD;
                 break;
 
             case GPIO_STM32L496VGT6P_Mode_Interrupt:
-                Context->InitType.Mode = GPIO_MODE_IT_RISING_FALLING;
+                Instance->InitType.Mode = GPIO_MODE_IT_RISING_FALLING;
                 break;
 
             case GPIO_STM32L496VGT6P_Mode_InterruptRising:
-                Context->InitType.Mode = GPIO_MODE_IT_RISING;
+                Instance->InitType.Mode = GPIO_MODE_IT_RISING;
                 break;
 
             case GPIO_STM32L496VGT6P_Mode_InterruptFalling:
-                Context->InitType.Mode = GPIO_MODE_IT_FALLING;
+                Instance->InitType.Mode = GPIO_MODE_IT_FALLING;
                 break;
 
             case GPIO_STM32L496VGT6P_Mode_Event:
-                Context->InitType.Mode = GPIO_MODE_EVT_RISING_FALLING;
+                Instance->InitType.Mode = GPIO_MODE_EVT_RISING_FALLING;
                 break;
 
             case GPIO_STM32L496VGT6P_Mode_EventRising:
-                Context->InitType.Mode = GPIO_MODE_EVT_RISING;
+                Instance->InitType.Mode = GPIO_MODE_EVT_RISING;
                 break;
 
             case GPIO_STM32L496VGT6P_Mode_EventFalling:
-                Context->InitType.Mode = GPIO_MODE_EVT_FALLING;
+                Instance->InitType.Mode = GPIO_MODE_EVT_FALLING;
                 break;
 
             case GPIO_STM32L496VGT6P_Mode_Alternate:
-                Context->InitType.Mode = GPIO_MODE_AF_PP;
+                Instance->InitType.Mode = GPIO_MODE_AF_PP;
                 break;
 
             case GPIO_STM32L496VGT6P_Mode_AlternateOpenDrain:
-                Context->InitType.Mode = GPIO_MODE_AF_OD;
+                Instance->InitType.Mode = GPIO_MODE_AF_OD;
                 break;
 
             case GPIO_STM32L496VGT6P_Mode_Analog:
-                Context->InitType.Mode = GPIO_MODE_ANALOG;
+                Instance->InitType.Mode = GPIO_MODE_ANALOG;
                 break;
 
             case GPIO_STM32L496VGT6P_Mode_AnalogADC:
-                Context->InitType.Mode = GPIO_MODE_ANALOG_ADC_CONTROL;
+                Instance->InitType.Mode = GPIO_MODE_ANALOG_ADC_CONTROL;
                 break;
 
             default:
@@ -674,20 +682,20 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_SetPull( GPIO_S
     {
         GPIO_Trace( "%s( GPIOx=%d, Pull=%d )", __FUNCTION__, GPIOx, Pull );
 
-        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ GPIOx ];
+        GPIO_STM32L496VGT6P_Instance_t * Instance = &GPIO_STM32L496VGT6P_Context.Instance[ GPIOx ];
 
         switch ( Pull )
         {
             case GPIO_STM32L496VGT6P_Pull_None:
-                Context->InitType.Pull = GPIO_NOPULL;
+                Instance->InitType.Pull = GPIO_NOPULL;
                 break;
 
             case GPIO_STM32L496VGT6P_Pull_Up:
-                Context->InitType.Pull = GPIO_PULLUP;
+                Instance->InitType.Pull = GPIO_PULLUP;
                 break;
 
             case GPIO_STM32L496VGT6P_Pull_Down:
-                Context->InitType.Pull = GPIO_PULLDOWN;
+                Instance->InitType.Pull = GPIO_PULLDOWN;
                 break;
 
             default:
@@ -708,24 +716,24 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_SetSpeed( GPIO_
     {
         GPIO_Trace( "%s( GPIOx=%d, Speed=%d )", __FUNCTION__, GPIOx, Speed );
 
-        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ GPIOx ];
+        GPIO_STM32L496VGT6P_Instance_t * Instance = &GPIO_STM32L496VGT6P_Context.Instance[ GPIOx ];
 
         switch ( Speed )
         {
             case GPIO_STM32L496VGT6P_Speed_Low:
-                Context->InitType.Speed = GPIO_SPEED_FREQ_LOW;
+                Instance->InitType.Speed = GPIO_SPEED_FREQ_LOW;
                 break;
 
             case GPIO_STM32L496VGT6P_Speed_Medium:
-                Context->InitType.Speed = GPIO_SPEED_FREQ_MEDIUM;
+                Instance->InitType.Speed = GPIO_SPEED_FREQ_MEDIUM;
                 break;
 
             case GPIO_STM32L496VGT6P_Speed_High:
-                Context->InitType.Speed = GPIO_SPEED_FREQ_HIGH;
+                Instance->InitType.Speed = GPIO_SPEED_FREQ_HIGH;
                 break;
 
             case GPIO_STM32L496VGT6P_Speed_VeryHigh:
-                Context->InitType.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+                Instance->InitType.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
                 break;
 
             default:
@@ -746,7 +754,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_SetFunction( GP
     {
         GPIO_Trace( "%s( GPIOx=%d, Function=%d )", __FUNCTION__, GPIOx, Function );
 
-        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ GPIOx ];
+        GPIO_STM32L496VGT6P_Instance_t * Instance = &GPIO_STM32L496VGT6P_Context.Instance[ GPIOx ];
 
         switch ( Function )
         {
@@ -778,7 +786,7 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_SetFunction( GP
             break;
         }
 
-        Context->InitType.Alternate = Function;
+        Instance->InitType.Alternate = Function;
     }
     while ( 0 );
 
@@ -793,11 +801,11 @@ static GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Instance_Commit( GPIO_ST
     {
         GPIO_Trace( "%s( GPIOx=%d )", __FUNCTION__, GPIOx );
 
-        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ GPIOx ];
+        GPIO_STM32L496VGT6P_Instance_t * Instance = &GPIO_STM32L496VGT6P_Context.Instance[ GPIOx ];
 
-        if ( Context->GPIOx != NULL )
+        if ( Instance->GPIOx != NULL )
         {
-            HAL_GPIO_Init( Context->GPIOx, &Context->InitType );
+            HAL_GPIO_Init( Instance->GPIOx, &Instance->InitType );
         }
     }
     while ( 0 );
@@ -877,9 +885,9 @@ GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_SetCallbackOnInterrupt( GPIO_ST
     {
         GPIO_Trace( "%s( GPIOx=%d, Callback=%p )", __FUNCTION__, GPIOx, Callback );
 
-        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ GPIOx ];
+        GPIO_STM32L496VGT6P_Instance_t * Instance = &GPIO_STM32L496VGT6P_Context.Instance[ GPIOx ];
 
-        Context->OnInterrupt = Callback;
+        Instance->OnInterrupt = Callback;
     }
     while ( 0 );
 
@@ -894,9 +902,9 @@ GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_SetCallbackOnEvent( GPIO_STM32L
     {
         GPIO_Trace( "%s( GPIOx=%d, Callback=%p )", __FUNCTION__, GPIOx, Callback );
 
-        GPIO_STM32L496VGT6P_InstanceContext_t * Context = &GPIO_STM32L496VGT6P_Context.Context[ GPIOx ];
+        GPIO_STM32L496VGT6P_Instance_t * Instance = &GPIO_STM32L496VGT6P_Context.Instance[ GPIOx ];
 
-        Context->OnEvent = Callback;
+        Instance->OnEvent = Callback;
     }
     while ( 0 );
 
@@ -1012,7 +1020,7 @@ GPIO_STM32L496VGT6P_Status_t GPIO_STM32L496VGT6P_Read( GPIO_STM32L496VGT6P_t GPI
 // #### Public Variable(s) #####################################################
 // #############################################################################
 
-const char GPIO_STM32L496VGT6P_VERSION[] = "0.0.0.v20260524-1454";
+const char GPIO_STM32L496VGT6P_VERSION[] = "0.0.0.v20260818-0345";
 
 // #############################################################################
 // #### File Guard #############################################################
